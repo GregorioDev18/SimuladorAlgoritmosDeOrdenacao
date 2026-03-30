@@ -1,15 +1,10 @@
 package template;
 
-import br.com.davidbuzatto.jsge.collision.CollisionUtils;
 import br.com.davidbuzatto.jsge.core.engine.EngineFrame;
-import static br.com.davidbuzatto.jsge.core.engine.EngineFrame.MOUSE_BUTTON_RIGHT;
 import br.com.davidbuzatto.jsge.imgui.GuiComponent;
 import br.com.davidbuzatto.jsge.imgui.GuiGroup;
 import br.com.davidbuzatto.jsge.imgui.GuiLabel;
 import br.com.davidbuzatto.jsge.imgui.GuiSlider;
-import br.com.davidbuzatto.jsge.imgui.GuiSpinner;
-import br.com.davidbuzatto.jsge.imgui.GuiToolTip;
-import br.com.davidbuzatto.jsge.math.Vector2;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,17 +16,16 @@ public class Main extends EngineFrame {
     private int copiaInsertion;
     private int copiaShell;
     private int copiaMerge;
+    private int copiaBucket;
+    private int copiaCounting;
 
     private int tamanho;
     private int margem;
     private int xIni;
     private int yIni;
 
-    private int groupSpace;
     private int groupWidth;
     private int groupHeight;
-    private int groupIniX;
-    private int groupIniY;
 
     private List<GuiComponent> components;
 
@@ -39,6 +33,8 @@ public class Main extends EngineFrame {
     private List<int[]> arraysInsertion;
     private List<int[]> arraysShell;
     private List<int[]> arraysMerge;
+    private List<int[]> arraysBucket;
+    private List<int[]> arraysCounting;
 
     private GuiLabel nomes;
 
@@ -46,19 +42,23 @@ public class Main extends EngineFrame {
     private GuiGroup groupInsertion;
     private GuiGroup groupShell;
     private GuiGroup groupMerge;
+    private GuiGroup groupBucket;
+    private GuiGroup groupCounting;
 
     private GuiSlider sliderSelection;
     private GuiSlider sliderInsertion;
     private GuiSlider sliderShell;
     private GuiSlider sliderMerge;
-    
+    private GuiSlider sliderBucket;
+    private GuiSlider sliderCounting;
+
     private List<GuiSlider> sliders;
 
     public Main() {
 
         super(
-                1055, // largura 
-                450, // algura         
+                900, // largura 
+                650, // altura         
                 "Algoritmos de Ordenação", // título         
                 60, // quadros por segundo desejado 
                 true, // suavização                 
@@ -75,19 +75,16 @@ public class Main extends EngineFrame {
 
         useAsDependencyForIMGUI();
 
-        setDefaultFontSize(30);
+        setDefaultFontSize(25);
         setDefaultFontStyle(FONT_BOLD_ITALIC);
 
         tamanho = 19;
         margem = 5;
 
-        xIni = 14;
-        yIni = (getScreenHeight()) / 2 + 80;
-        groupSpace = 15;
+        xIni = 40;
+        yIni = 80;
         groupWidth = 245;
         groupHeight = 210;
-        groupIniX = groupSpace + groupWidth;
-        groupIniY = yIni - groupHeight + 5;
 
         components = new ArrayList<>();
         sliders = new ArrayList<>();
@@ -96,11 +93,15 @@ public class Main extends EngineFrame {
         arraysInsertion = new ArrayList<>();
         arraysShell = new ArrayList<>();
         arraysMerge = new ArrayList<>();
+        arraysBucket = new ArrayList<>();
+        arraysCounting = new ArrayList<>();
 
-        groupSelection = new GuiGroup(xIni, groupIniY, groupWidth, groupHeight, "Selection Sort");
-        groupInsertion = new GuiGroup(xIni + groupIniX, groupIniY, groupWidth, groupHeight, "Insertion Sort");
-        groupShell = new GuiGroup(xIni + groupIniX * 2, groupIniY, groupWidth, groupHeight, "Shell Sort");
-        groupMerge = new GuiGroup(xIni + groupIniX * 3, groupIniY, groupWidth, groupHeight, "Merge Sort");
+        groupSelection = new GuiGroup(xIni, yIni, groupWidth, groupHeight, "Selection Sort");
+        groupInsertion = new GuiGroup(groupSelection.getX() + groupWidth + xIni, yIni, groupWidth, groupHeight, "Insertion Sort");
+        groupShell = new GuiGroup(groupInsertion.getX() + groupWidth + xIni, yIni, groupWidth, groupHeight, "Shell Sort");
+        groupMerge = new GuiGroup(xIni, groupSelection.getY() + groupHeight + 70, groupWidth, groupHeight, "Merge Sort");
+        groupBucket = new GuiGroup(groupMerge.getX() + groupWidth + xIni, groupMerge.getY(), groupWidth, groupHeight, "Bucket Sort");
+        groupCounting = new GuiGroup(groupBucket.getX() + groupWidth + xIni, groupMerge.getY(), groupWidth, groupHeight, "Couting Sort");
 
         array = new int[]{10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
 
@@ -108,20 +109,26 @@ public class Main extends EngineFrame {
         insertionSort(array.clone());
         shellSort(array.clone());
         mergeSort(array.clone(), 0, array.clone().length - 1);
+        bucketSort(array.clone());
+        countingSort(array.clone());
 
         nomes = new GuiLabel(getScreenWidth() - 260, getScreenHeight() - 30, 30, 30, "João Vitor Gregorio e Raissa Machado");
 
-        sliderSelection = new GuiSlider(groupSelection.getX(), yIni, groupWidth, 50, 0, 0, (arraysSelection.size() - 1) / 2);
-        sliderInsertion = new GuiSlider(groupInsertion.getX(), yIni, groupWidth, 50, 0, 0, (arraysInsertion.size() - 1));
-        sliderShell = new GuiSlider(groupShell.getX(), yIni, groupWidth, 50, 0, 0, (arraysShell.size() - 1));
-        sliderMerge = new GuiSlider(groupMerge.getX(), yIni, groupWidth, 50, 0, 0, (arraysMerge.size()) - 1);
+        sliderSelection = new GuiSlider(groupSelection.getX(), yIni + groupHeight, groupWidth, 40, 0, 0, (arraysSelection.size() - 1) / 2);
+        sliderInsertion = new GuiSlider(groupInsertion.getX(), yIni + groupHeight, groupWidth, 40, 0, 0, (arraysInsertion.size() - 1));
+        sliderShell = new GuiSlider(groupShell.getX(), groupShell.getY() + groupHeight, groupWidth, 40, 0, 0, (arraysShell.size() - 1));
+        sliderMerge = new GuiSlider(groupMerge.getX(), groupMerge.getY() + groupHeight, groupWidth, 40, 0, 0, (arraysMerge.size()) - 1);
+        sliderBucket = new GuiSlider(groupBucket.getX(), groupBucket.getY() + groupHeight, groupWidth, 40, 0, 0, (arraysBucket.size()) - 1);
+        sliderCounting = new GuiSlider(groupCounting.getX(), groupCounting.getY() + groupHeight, groupWidth, 40, 0, 0, (arraysCounting.size()) - 1);
 
         components.add(nomes);
-        
+
         sliders.add(sliderSelection);
         sliders.add(sliderInsertion);
         sliders.add(sliderShell);
         sliders.add(sliderMerge);
+        sliders.add(sliderBucket);
+        sliders.add(sliderCounting);
     }
 
     @Override
@@ -136,6 +143,8 @@ public class Main extends EngineFrame {
         copiaInsertion = (int) sliderInsertion.getValue();
         copiaShell = (int) sliderShell.getValue();
         copiaMerge = (int) sliderMerge.getValue();
+        copiaBucket = (int) sliderBucket.getValue();
+        copiaCounting = (int) sliderCounting.getValue();
     }
 
     @Override
@@ -144,19 +153,18 @@ public class Main extends EngineFrame {
         clearBackground(BLACK);
 
         for (GuiComponent c : components) {
-
             c.draw();
         }
-        
+
         for (GuiSlider s : sliders) {
-            
+
             s.setTrackFillColor(DARKGREEN);
             s.setBorderColor(BLACK);
             s.setBackgroundColor(WHITE);
             s.draw();
         }
 
-        for (GuiComponent g : List.of(groupSelection, groupInsertion, groupShell, groupMerge)) {
+        for (GuiComponent g : List.of(groupSelection, groupInsertion, groupShell, groupMerge, groupBucket, groupCounting)) {
 
             fillRectangle(
                     g.getX(),
@@ -170,23 +178,25 @@ public class Main extends EngineFrame {
             g.draw();
         }
 
-        desenharArray(arraysSelection.get(copiaSelection), groupSelection.getX() + margem);
-        desenharArray(arraysInsertion.get(copiaInsertion), groupInsertion.getX() + margem);
-        desenharArray(arraysShell.get(copiaShell), groupShell.getX() + margem);
-        desenharArray(arraysMerge.get(copiaMerge), groupMerge.getX() + margem);
+        desenharArray(arraysSelection.get(copiaSelection), groupSelection.getX() + margem, groupSelection.getY());
+        desenharArray(arraysInsertion.get(copiaInsertion), groupInsertion.getX() + margem, groupInsertion.getY());
+        desenharArray(arraysShell.get(copiaShell), groupShell.getX() + margem, (double) groupShell.getY());
+        desenharArray(arraysMerge.get(copiaMerge), groupMerge.getX() + margem, groupMerge.getY());
+        desenharArray(arraysBucket.get(copiaBucket), groupBucket.getX() + margem, groupBucket.getY());
+        desenharArray(arraysCounting.get(copiaCounting), groupCounting.getX() + margem, groupCounting.getY());
 
-        drawText("Projeto - Algoritmos de Ordenação", (getScreenWidth() / 2) - 300, 35, DARKGREEN);
+        drawText("Projeto - Algoritmos de Ordenação", (getScreenWidth() / 2) - 246, 30, DARKGREEN);
     }
 
-    private void desenharArray(int[] a, double n) {
+    private void desenharArray(int[] a, double x, double y) {
 
         for (int i = 0; i < a.length; i++) {
 
             int altura = tamanho * a[i];
 
             fillRectangle(
-                    n + (tamanho + margem) * i,
-                    yIni - altura,
+                    x + (tamanho + margem) * i,
+                    y + groupHeight - altura,
                     tamanho,
                     altura, DARKPURPLE
             );
@@ -305,6 +315,83 @@ public class Main extends EngineFrame {
             }
         }
         arraysMerge.add(copiarArray(array));
+    }
+
+    void bucketSort(int[] array) {
+        arraysBucket.add(copiarArray(array));
+
+        int max = array[0];
+        int min = array[0];
+
+        // Descobrir range
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] > max) {
+                max = array[i];
+            }
+            if (array[i] < min) {
+                min = array[i];
+            }
+        }
+
+        int bucketCount = max - min + 1;
+
+        List<List<Integer>> buckets = new ArrayList<>();
+
+        // Criar buckets
+        for (int i = 0; i < bucketCount; i++) {
+            buckets.add(new ArrayList<>());
+        }
+
+        // Distribuir elementos nos buckets
+        for (int value : array) {
+            buckets.get(value - min).add(value);
+        }
+
+        // Reconstruir array
+        int index = 0;
+        for (List<Integer> bucket : buckets) {
+            for (int value : bucket) {
+                array[index++] = value;
+                arraysBucket.add(copiarArray(array));
+            }
+        }
+
+        arraysBucket.add(copiarArray(array));
+    }
+
+    void countingSort(int[] array) {
+        arraysCounting.add(copiarArray(array));
+
+        int max = array[0];
+
+        // Achar o maior valor
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] > max) {
+                max = array[i];
+            }
+        }
+
+        int[] count = new int[max + 1];
+
+        // Contar ocorrências
+        for (int i = 0; i < array.length; i++) {
+            count[array[i]]++;
+        }
+
+        // Reconstruir array ordenado
+        int index = 0;
+
+        for (int i = 0; i < count.length; i++) {
+            while (count[i] > 0) {
+                array[index++] = i;
+                count[i]--;
+
+                arraysCounting.add(copiarArray(array));
+            }
+        }
+
+        arraysCounting.add(copiarArray(array));
+
     }
 
     public static void main(String[] args) {
