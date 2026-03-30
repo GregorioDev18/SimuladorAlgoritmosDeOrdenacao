@@ -110,7 +110,7 @@ public class Main extends EngineFrame {
         shellSort(array.clone());
         mergeSort(array.clone(), 0, array.clone().length - 1);
         bucketSort(array.clone());
-        countingSort(array.clone());
+        countingSort(array.clone(), 10);
 
         nomes = new GuiLabel(getScreenWidth() - 260, getScreenHeight() - 30, 30, 30, "João Vitor Gregorio e Raissa Machado");
 
@@ -318,80 +318,71 @@ public class Main extends EngineFrame {
     }
 
     void bucketSort(int[] array) {
-        arraysBucket.add(copiarArray(array));
+        int n = array.length;
 
-        int max = array[0];
-        int min = array[0];
+        final int K = 10;
 
-        // Descobrir range
-        for (int i = 1; i < array.length; i++) {
-            if (array[i] > max) {
-                max = array[i];
-            }
-            if (array[i] < min) {
-                min = array[i];
-            }
-        }
+        int[][] buckets = new int[K][n];
+        int[] c = new int[K];
 
-        int bucketCount = max - min + 1;
+        int t1 = 10;
+        int t2 = 1;
 
-        List<List<Integer>> buckets = new ArrayList<>();
+        int max = -1;
 
-        // Criar buckets
-        for (int i = 0; i < bucketCount; i++) {
-            buckets.add(new ArrayList<>());
-        }
+        boolean first = true;
 
-        // Distribuir elementos nos buckets
-        for (int value : array) {
-            buckets.get(value - min).add(value);
-        }
+        while (max < 0 || max / t2 != 0) {
 
-        // Reconstruir array
-        int index = 0;
-        for (List<Integer> bucket : buckets) {
-            for (int value : bucket) {
-                array[index++] = value;
+            for (int i = 0; i < n; i++) {
+                int p = array[i] % t1 / t2;
+                buckets[p][c[p]++] = array[i];
+
+                if (first) {
+                    max = max < array[i] ? array[i] : max;
+                }
+
                 arraysBucket.add(copiarArray(array));
             }
-        }
 
-        arraysBucket.add(copiarArray(array));
+            first = false;
+
+            int k = 0;
+
+            for (int i = 0; i < K; i++) {
+                for (int j = 0; j < c[i]; j++) {
+                    array[k++] = buckets[i][j];
+                }
+
+                arraysBucket.add(copiarArray(array));
+
+                c[i] = 0;
+            }
+
+            t2 = t1;
+            t1 *= 10;
+        }
     }
 
-    void countingSort(int[] array) {
-        arraysCounting.add(copiarArray(array));
+    void countingSort(int[] array, int k) {
+        int n = array.length;
+        int[] c = new int[k + 1];
+        int[] b = new int[n];
 
-        int max = array[0];
-
-        // Achar o maior valor
-        for (int i = 1; i < array.length; i++) {
-            if (array[i] > max) {
-                max = array[i];
-            }
+        for (int i = 0; i < n; i++) {
+            c[array[i]]++;
         }
 
-        int[] count = new int[max + 1];
-
-        // Contar ocorrências
-        for (int i = 0; i < array.length; i++) {
-            count[array[i]]++;
+        for (int i = 1; i <= k; i++) {
+            c[i] += c[i - 1];
         }
 
-        // Reconstruir array ordenado
-        int index = 0;
-
-        for (int i = 0; i < count.length; i++) {
-            while (count[i] > 0) {
-                array[index++] = i;
-                count[i]--;
-
-                arraysCounting.add(copiarArray(array));
-            }
+        for (int i = n - 1; i >= 0; i--) {
+            c[array[i]]--;
+            b[c[array[i]]] = array[i];
         }
 
         arraysCounting.add(copiarArray(array));
-
     }
 
     public static void main(String[] args) {
