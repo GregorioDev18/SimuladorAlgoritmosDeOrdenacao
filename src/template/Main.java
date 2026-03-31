@@ -318,6 +318,8 @@ public class Main extends EngineFrame {
     }
 
     void bucketSort(int[] array) {
+        arraysBucket.add(copiarArray(array));
+
         int n = array.length;
 
         final int K = 10;
@@ -342,6 +344,7 @@ public class Main extends EngineFrame {
                     max = max < array[i] ? array[i] : max;
                 }
 
+                array[i] = 0;
                 arraysBucket.add(copiarArray(array));
             }
 
@@ -352,9 +355,8 @@ public class Main extends EngineFrame {
             for (int i = 0; i < K; i++) {
                 for (int j = 0; j < c[i]; j++) {
                     array[k++] = buckets[i][j];
+                    arraysBucket.add(copiarArray(array));
                 }
-
-                arraysBucket.add(copiarArray(array));
 
                 c[i] = 0;
             }
@@ -366,8 +368,11 @@ public class Main extends EngineFrame {
 
     void countingSort(int[] array, int k) {
         int n = array.length;
+
         int[] c = new int[k + 1];
         int[] b = new int[n];
+
+        arraysCounting.add(copiarArray(array));
 
         for (int i = 0; i < n; i++) {
             c[array[i]]++;
@@ -382,7 +387,10 @@ public class Main extends EngineFrame {
             b[c[array[i]]] = array[i];
         }
 
-        arraysCounting.add(copiarArray(array));
+        for (int i = 0; i < n; i++) {
+            array[i] = b[i];
+            arraysCounting.add(copiarArray(array));
+        }
     }
 
     public static void main(String[] args) {
