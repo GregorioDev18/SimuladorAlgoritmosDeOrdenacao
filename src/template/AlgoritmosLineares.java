@@ -18,15 +18,12 @@ public class AlgoritmosLineares extends EngineFrame {
 
     private int[] array;
     private int[] arrayAuxBucket;
-    int[][] bucketsVisual;
 
     private int copiaBucket;
     private int copiaCounting;
 
     private int tamanho;
     private int margem;
-    private int xIni;
-    private int yIni;
 
     private int groupWidth;
     private int groupHeight;
@@ -37,6 +34,7 @@ public class AlgoritmosLineares extends EngineFrame {
     private List<int[]> arraysCounting;
     private List<int[]> arraysAuxBucket;
     private List<int[][]> arraysBucketsVisual;
+    private List<String> etapasBucket;
 
     private GuiLabel nomes;
 
@@ -53,7 +51,7 @@ public class AlgoritmosLineares extends EngineFrame {
         super(
                 900, // largura 
                 650, // altura         
-                "Algoritmos de Ordenação Linear", // título         
+                "Algoritmos de Ordenação Lineares", // título         
                 60, // quadros por segundo desejado 
                 true, // suavização                 
                 false, // redimensionável            
@@ -75,8 +73,6 @@ public class AlgoritmosLineares extends EngineFrame {
         tamanho = 19;
         margem = 5;
 
-        xIni = 40;
-        yIni = 80;
         groupWidth = 245;
         groupHeight = 210;
 
@@ -86,11 +82,12 @@ public class AlgoritmosLineares extends EngineFrame {
         arraysCounting = new ArrayList<>();
         arraysAuxBucket = new ArrayList<>();
         arraysBucketsVisual = new ArrayList<>();
+        etapasBucket = new ArrayList<>();
 
-        groupBucket = new GuiGroup(30, 80, groupWidth, groupHeight, "Bucket Sort");
-        groupCounting = new GuiGroup(30, groupBucket.getY() + groupHeight + 40, groupWidth, groupHeight, "Couting Sort");
+        groupBucket = new GuiGroup(120, 90, groupWidth, groupHeight, "Bucket Sort");
+        groupCounting = new GuiGroup(120, groupBucket.getY() + groupHeight + 50, groupWidth, groupHeight, "Couting Sort");
 
-        array = new int[]{10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
+        array = new int[]{10, 10, 9, 7, 6, 5, 5, 3, 1, 1};
         arrayAuxBucket = new int[10];
 
         for (int i = 0; i < arrayAuxBucket.length; i++) {
@@ -157,15 +154,25 @@ public class AlgoritmosLineares extends EngineFrame {
         desenharArray(arraysBucket.get(copiaBucket), groupBucket.getX() + margem, groupBucket.getY());
         desenharArray(arraysCounting.get(copiaCounting), groupCounting.getX() + margem, groupCounting.getY());
 
+        drawText("Algoritmos de Ordenação Lineares", (getScreenWidth() / 2) - 233, 30, DARKGREEN);
+
+        if (copiaBucket < etapasBucket.size()) {
+            drawText(
+                    "Etapa: " + etapasBucket.get(copiaBucket),
+                    groupBucket.getX() + groupWidth + 30,
+                    groupBucket.getY(),
+                    20,
+                    WHITE
+            );
+        }
+
         if (copiaBucket < arraysBucketsVisual.size()) {
             desenharBuckets(
                     arraysBucketsVisual.get(copiaBucket),
                     groupBucket.getX() + groupWidth + 30,
-                    groupBucket.getY()
+                    groupBucket.getY() + 30
             );
         }
-
-        drawText("Projeto - Algoritmos de Ordenação", (getScreenWidth() / 2) - 246, 30, DARKGREEN);
     }
 
     private void desenharArray(int[] a, double x, double y) {
@@ -183,42 +190,22 @@ public class AlgoritmosLineares extends EngineFrame {
         }
     }
 
-    private void desenharArrayTexto(int[] a) {
-        StringBuilder sb = new StringBuilder();
-
-        boolean primeiro = true;
-
-        for (int i = 0; i < a.length; i++) {
-            if (a[i] != -1) {
-                if (!primeiro) {
-                    sb.append(" | ");
-                }
-                sb.append(a[i]);
-                primeiro = false;
-            }
-        }
-
-        drawText(sb.toString(), groupBucket.getX() + groupWidth + 38, groupBucket.getY(), 20, WHITE);
-    }
-
     private void desenharBuckets(int[][] buckets, double x, double y) {
 
         int larguraBucket = 30;
-        int alturaMax = 100;
+        int alturaMax = groupHeight - 30;
 
         for (int i = 0; i < buckets.length; i++) {
 
             int baseX = (int) x + i * (larguraBucket + 10);
 
-            // desenha "caixa" do bucket
             drawRectangle(baseX, (int) y, larguraBucket, alturaMax, WHITE);
 
-            // desenha elementos dentro
             for (int j = 0; j < buckets[i].length; j++) {
 
                 if (buckets[i][j] != -1) {
 
-                    int altura = 10;
+                    int altura = 20;
 
                     fillRectangle(
                             baseX,
@@ -230,37 +217,49 @@ public class AlgoritmosLineares extends EngineFrame {
                 }
             }
 
-            // label do bucket
             drawText(String.valueOf(i), baseX + 5, (int) y + alturaMax + 5, 15, WHITE);
         }
     }
 
     private Color getColorByIndex(int i) {
 
-        switch (i) {
-            case 0:
-                return RED;
-            case 1:
-                return ORANGE;
-            case 2:
-                return YELLOW;
-            case 3:
-                return GREEN;
-            case 4:
-                return BLUE;
-            case 5:
-                return DARKBLUE;
-            case 6:
-                return PURPLE;
-            case 7:
-                return PINK;
-            case 8:
-                return BROWN;
-            case 9:
-                return GRAY;
-            default:
-                return WHITE;
-        }
+        return switch (i) {
+            case 0 ->
+                RED;
+            case 1 ->
+                ORANGE;
+            case 2 ->
+                YELLOW;
+            case 3 ->
+                GREEN;
+            case 4 ->
+                BLUE;
+            case 5 ->
+                DARKBLUE;
+            case 6 ->
+                PURPLE;
+            case 7 ->
+                PINK;
+            case 8 ->
+                BROWN;
+            case 9 ->
+                GRAY;
+            default ->
+                WHITE;
+        };
+    }
+
+    private String getEtapa(int t2) {
+        return switch (t2) {
+            case 1 ->
+                "Unidades";
+            case 10 ->
+                "Dezenas";
+            case 100 ->
+                "Centenas";
+            default ->
+                "Casa " + t2;
+        };
     }
 
     private int[] copiarArray(int[] array) {
@@ -271,6 +270,10 @@ public class AlgoritmosLineares extends EngineFrame {
     }
 
     void bucketSort(int[] array) {
+        int t1 = 10;
+        int t2 = 1;
+
+        etapasBucket.add(getEtapa(t2));
         arraysBucket.add(copiarArray(array));
         arraysAuxBucket.add(copiarArray(arrayAuxBucket));
 
@@ -290,15 +293,12 @@ public class AlgoritmosLineares extends EngineFrame {
 
         int[] c = new int[K];
 
-        int t1 = 10;
-        int t2 = 1;
-
         int max = -1;
 
         boolean first = true;
 
         while (max < 0 || max / t2 != 0) {
-            
+
             limparBuckets(buckets, c);
 
             for (int i = 0; i < n; i++) {
@@ -314,6 +314,7 @@ public class AlgoritmosLineares extends EngineFrame {
                 arraysAuxBucket.add(copiarArray(arrayAuxBucket));
 
                 array[i] = 0;
+                etapasBucket.add(getEtapa(t2));
                 arraysBucket.add(copiarArray(array));
             }
 
@@ -324,6 +325,10 @@ public class AlgoritmosLineares extends EngineFrame {
             for (int i = 0; i < K; i++) {
                 for (int j = 0; j < c[i]; j++) {
                     int valor = buckets[i][j];
+
+                    buckets[i][j] = -1;
+                    arraysBucketsVisual.add(copiarBuckets(buckets));
+
                     array[k] = valor;
 
                     for (int x = 0; x < arrayAuxBucket.length; x++) {
@@ -336,6 +341,7 @@ public class AlgoritmosLineares extends EngineFrame {
                     }
 
                     k++;
+                    etapasBucket.add(getEtapa(t2));
                     arraysBucket.add(copiarArray(array));
                 }
             }
