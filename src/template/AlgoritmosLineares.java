@@ -16,18 +16,14 @@ import java.util.List;
 
 public class AlgoritmosLineares extends EngineFrame {
 
-    private int[] array;
-
     private int copiaBucket;
     private int copiaCounting;
-
     private int tamanho;
     private int margem;
-
     private int groupWidth;
     private int groupHeight;
 
-    private List<GuiComponent> components;
+    private int[] array;
 
     private List<int[]> arraysBucket;
     private List<int[]> arraysCounting;
@@ -37,19 +33,16 @@ public class AlgoritmosLineares extends EngineFrame {
     private List<boolean[]> arraysExiste;
     private List<String> etapasCounting;
     private List<String> etapasBucket;
+    private List<GuiComponent> components;
+    private List<GuiSlider> sliders;
 
     private GuiLabel nomes;
-
     private GuiGroup groupBucket;
     private GuiGroup groupCounting;
-
     private GuiSlider sliderBucket;
     private GuiSlider sliderCounting;
 
-    private List<GuiSlider> sliders;
-
     public AlgoritmosLineares() {
-
         super(
                 900, // largura 
                 650, // altura         
@@ -66,7 +59,6 @@ public class AlgoritmosLineares extends EngineFrame {
 
     @Override
     public void create() {
-
         useAsDependencyForIMGUI();
 
         setDefaultFontSize(25);
@@ -90,7 +82,7 @@ public class AlgoritmosLineares extends EngineFrame {
         arraysExiste = new ArrayList<>();
 
         groupBucket = new GuiGroup(120, 90, groupWidth, groupHeight, "Bucket Sort");
-        groupCounting = new GuiGroup(120, groupBucket.getY() + groupHeight + 50, groupWidth, groupHeight, "Couting Sort");
+        groupCounting = new GuiGroup(120, groupBucket.getY() + groupHeight + 50, groupWidth, groupHeight, "Counting Sort");
 
         array = new int[]{10, 10, 9, 7, 6, 5, 5, 3, 1, 1};
 
@@ -110,7 +102,6 @@ public class AlgoritmosLineares extends EngineFrame {
 
     @Override
     public void update(double delta) {
-
         for (GuiComponent c : sliders) {
             c.update(delta);
 
@@ -122,7 +113,6 @@ public class AlgoritmosLineares extends EngineFrame {
 
     @Override
     public void draw() {
-
         clearBackground(BLACK);
 
         for (GuiComponent c : components) {
@@ -196,7 +186,6 @@ public class AlgoritmosLineares extends EngineFrame {
     }
 
     private void desenharArray(int[] a, double x, double y) {
-
         for (int i = 0; i < a.length; i++) {
 
             int altura = tamanho * a[i];
@@ -212,7 +201,6 @@ public class AlgoritmosLineares extends EngineFrame {
     }
 
     private void desenharBuckets(int[][] buckets, double x, double y) {
-
         int larguraBucket = 30;
         int alturaMax = groupHeight - 30;
 
@@ -243,7 +231,6 @@ public class AlgoritmosLineares extends EngineFrame {
     }
 
     private void desenharCounting(int[] a, double x, double y) {
-
         int largura = 35;
         int altura = 30;
 
@@ -290,7 +277,6 @@ public class AlgoritmosLineares extends EngineFrame {
     }
 
     private void desenharArrayPequeno(int[] a, double x, double y) {
-
         int largura = 35;
         int altura = 30;
 
@@ -330,7 +316,6 @@ public class AlgoritmosLineares extends EngineFrame {
     }
 
     private Color getColorByIndex(int i) {
-
         return switch (i) {
             case 0 ->
                 RED;
@@ -373,7 +358,6 @@ public class AlgoritmosLineares extends EngineFrame {
     }
 
     private int[] copiarArray(int[] array) {
-
         int[] copia = new int[array.length];
         System.arraycopy(array, 0, copia, 0, array.length);
         return copia;
@@ -459,7 +443,6 @@ public class AlgoritmosLineares extends EngineFrame {
     }
 
     private int[][] copiarBuckets(int[][] buckets) {
-
         int[][] copia = new int[buckets.length][buckets[0].length];
 
         for (int i = 0; i < buckets.length; i++) {
@@ -556,7 +539,6 @@ public class AlgoritmosLineares extends EngineFrame {
     }
 
     public static void main(String[] args) {
-
         new AlgoritmosLineares();
     }
 }
