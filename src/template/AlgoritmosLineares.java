@@ -3,7 +3,6 @@ package template;
 import br.com.davidbuzatto.jsge.core.engine.EngineFrame;
 import static br.com.davidbuzatto.jsge.core.engine.EngineFrame.BLACK;
 import static br.com.davidbuzatto.jsge.core.engine.EngineFrame.DARKGREEN;
-import static br.com.davidbuzatto.jsge.core.engine.EngineFrame.DARKPURPLE;
 import static br.com.davidbuzatto.jsge.core.engine.EngineFrame.FONT_BOLD_ITALIC;
 import static br.com.davidbuzatto.jsge.core.engine.EngineFrame.WHITE;
 import br.com.davidbuzatto.jsge.imgui.GuiComponent;
@@ -11,13 +10,13 @@ import br.com.davidbuzatto.jsge.imgui.GuiGroup;
 import br.com.davidbuzatto.jsge.imgui.GuiLabel;
 import br.com.davidbuzatto.jsge.imgui.GuiSlider;
 import java.awt.Color;
+import static java.awt.Color.CYAN;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AlgoritmosLineares extends EngineFrame {
 
     private int[] array;
-    private int[] arrayAuxBucket;
 
     private int copiaBucket;
     private int copiaCounting;
@@ -32,8 +31,11 @@ public class AlgoritmosLineares extends EngineFrame {
 
     private List<int[]> arraysBucket;
     private List<int[]> arraysCounting;
-    private List<int[]> arraysAuxBucket;
+    private List<int[]> arraysC;
+    private List<int[]> arraysB;
     private List<int[][]> arraysBucketsVisual;
+    private List<boolean[]> arraysExiste;
+    private List<String> etapasCounting;
     private List<String> etapasBucket;
 
     private GuiLabel nomes;
@@ -80,19 +82,17 @@ public class AlgoritmosLineares extends EngineFrame {
         sliders = new ArrayList<>();
         arraysBucket = new ArrayList<>();
         arraysCounting = new ArrayList<>();
-        arraysAuxBucket = new ArrayList<>();
         arraysBucketsVisual = new ArrayList<>();
         etapasBucket = new ArrayList<>();
+        arraysC = new ArrayList<>();
+        arraysB = new ArrayList<>();
+        etapasCounting = new ArrayList<>();
+        arraysExiste = new ArrayList<>();
 
         groupBucket = new GuiGroup(120, 90, groupWidth, groupHeight, "Bucket Sort");
         groupCounting = new GuiGroup(120, groupBucket.getY() + groupHeight + 50, groupWidth, groupHeight, "Couting Sort");
 
         array = new int[]{10, 10, 9, 7, 6, 5, 5, 3, 1, 1};
-        arrayAuxBucket = new int[10];
-
-        for (int i = 0; i < arrayAuxBucket.length; i++) {
-            arrayAuxBucket[i] = -1;
-        }
 
         bucketSort(array.clone());
         countingSort(array.clone(), 10);
@@ -173,6 +173,26 @@ public class AlgoritmosLineares extends EngineFrame {
                     groupBucket.getY() + 30
             );
         }
+
+        drawText(
+                "Etapa: " + etapasCounting.get(copiaCounting),
+                groupCounting.getX() + groupWidth + 30,
+                groupCounting.getY(),
+                20,
+                WHITE
+        );
+
+        desenharCounting(
+                arraysC.get(copiaCounting),
+                groupCounting.getX() + groupWidth + 30,
+                groupCounting.getY() + 30
+        );
+
+        desenharArrayPequeno(
+                arraysB.get(copiaCounting),
+                groupCounting.getX() + groupWidth + 30,
+                groupCounting.getY() + 100
+        );
     }
 
     private void desenharArray(int[] a, double x, double y) {
@@ -185,7 +205,8 @@ public class AlgoritmosLineares extends EngineFrame {
                     x + (tamanho + margem) * i,
                     y + groupHeight - altura,
                     tamanho,
-                    altura, DARKPURPLE
+                    altura,
+                    getColorByIndex(a[i])
             );
         }
     }
@@ -208,16 +229,103 @@ public class AlgoritmosLineares extends EngineFrame {
                     int altura = 20;
 
                     fillRectangle(
-                            baseX,
+                            baseX + 1,
                             (int) y + alturaMax - (j + 1) * altura,
-                            larguraBucket,
+                            larguraBucket - 1,
                             altura,
-                            getColorByIndex(i)
+                            getColorByIndex(buckets[i][j])
                     );
                 }
             }
 
-            drawText(String.valueOf(i), baseX + 5, (int) y + alturaMax + 5, 15, WHITE);
+            drawText(String.valueOf(i), baseX + 10, (int) y + alturaMax + 5, 15, WHITE);
+        }
+    }
+
+    private void desenharCounting(int[] a, double x, double y) {
+
+        int largura = 35;
+        int altura = 30;
+
+        for (int i = 0; i < a.length; i++) {
+
+            boolean[] existeAtual = arraysExiste.get(copiaCounting);
+
+            Color cor;
+
+            if (existeAtual[i]) {
+                cor = getColorByIndex(i);
+            } else {
+                cor = BLACK;
+            }
+
+            int baseX = (int) x + i * largura;
+
+            fillRectangle(
+                    baseX,
+                    y,
+                    largura,
+                    altura,
+                    cor
+            );
+
+            drawRectangle(
+                    baseX,
+                    y,
+                    largura,
+                    altura,
+                    WHITE
+            );
+
+            drawText(
+                    String.valueOf(i),
+                    x + i * largura + 12,
+                    y + 12,
+                    15,
+                    WHITE
+            );
+
+            drawText(String.valueOf(a[i]), baseX + 10, (int) y + altura + 5, 15, WHITE);
+        }
+    }
+
+    private void desenharArrayPequeno(int[] a, double x, double y) {
+
+        int largura = 35;
+        int altura = 30;
+
+        for (int i = 0; i < a.length; i++) {
+
+            Color cor = (a[i] > 0)
+                    ? getColorByIndex(a[i])
+                    : BLACK;
+
+            int baseX = (int) x + i * largura;
+
+            fillRectangle(
+                    baseX,
+                    y,
+                    largura,
+                    altura,
+                    cor
+            );
+
+            drawRectangle(
+                    baseX,
+                    y,
+                    largura,
+                    altura,
+                    WHITE
+            );
+
+            drawText(String.valueOf(a[i]),
+                    x + i * largura + 12,
+                    y + 12,
+                    15,
+                    WHITE
+            );
+
+            drawText(String.valueOf(i), baseX + 10, (int) y + altura + 5, 15, WHITE);
         }
     }
 
@@ -233,17 +341,19 @@ public class AlgoritmosLineares extends EngineFrame {
             case 3 ->
                 GREEN;
             case 4 ->
-                BLUE;
+                CYAN;
             case 5 ->
-                DARKBLUE;
+                BLUE;
             case 6 ->
-                PURPLE;
+                new Color(75, 0, 130);
             case 7 ->
-                PINK;
+                new Color(148, 0, 211);
             case 8 ->
-                BROWN;
+                new Color(255, 105, 180);
             case 9 ->
-                GRAY;
+                new Color(255, 20, 147);
+            case 10 ->
+                new Color(255, 0, 255);
             default ->
                 WHITE;
         };
@@ -273,10 +383,6 @@ public class AlgoritmosLineares extends EngineFrame {
         int t1 = 10;
         int t2 = 1;
 
-        etapasBucket.add(getEtapa(t2));
-        arraysBucket.add(copiarArray(array));
-        arraysAuxBucket.add(copiarArray(arrayAuxBucket));
-
         int n = array.length;
 
         final int K = 10;
@@ -289,6 +395,8 @@ public class AlgoritmosLineares extends EngineFrame {
             }
         }
 
+        etapasBucket.add("Inicial");
+        arraysBucket.add(copiarArray(array));
         arraysBucketsVisual.add(copiarBuckets(buckets));
 
         int[] c = new int[K];
@@ -310,15 +418,14 @@ public class AlgoritmosLineares extends EngineFrame {
                     max = max < array[i] ? array[i] : max;
                 }
 
-                arrayAuxBucket[i] = array[i];
-                arraysAuxBucket.add(copiarArray(arrayAuxBucket));
-
                 array[i] = 0;
                 etapasBucket.add(getEtapa(t2));
                 arraysBucket.add(copiarArray(array));
             }
 
             first = false;
+
+            boolean ultimaIteracao = (max / t1 == 0);
 
             int k = 0;
 
@@ -331,17 +438,13 @@ public class AlgoritmosLineares extends EngineFrame {
 
                     array[k] = valor;
 
-                    for (int x = 0; x < arrayAuxBucket.length; x++) {
-                        if (arrayAuxBucket[x] == valor) {
-                            arrayAuxBucket[x] = -1;
-                            arraysAuxBucket.add(copiarArray(arrayAuxBucket));
-
-                            break;
-                        }
+                    k++;
+                    if (ultimaIteracao) {
+                        etapasBucket.add("Final");
+                    } else {
+                        etapasBucket.add(getEtapa(t2));
                     }
 
-                    k++;
-                    etapasBucket.add(getEtapa(t2));
                     arraysBucket.add(copiarArray(array));
                 }
             }
@@ -349,6 +452,10 @@ public class AlgoritmosLineares extends EngineFrame {
             t2 = t1;
             t1 *= 10;
         }
+
+        etapasBucket.add("Final");
+        arraysBucket.add(copiarArray(array));
+        arraysBucketsVisual.add(copiarBuckets(buckets));
     }
 
     private int[][] copiarBuckets(int[][] buckets) {
@@ -374,27 +481,77 @@ public class AlgoritmosLineares extends EngineFrame {
     void countingSort(int[] array, int k) {
         int n = array.length;
 
+        int[] freq = new int[k + 1];
+
+        boolean[] existe = new boolean[k + 1];
+
         int[] c = new int[k + 1];
         int[] b = new int[n];
 
-        arraysCounting.add(copiarArray(array));
+        int[] arrayVisual = copiarArray(array);
+
+        etapasCounting.add("Inicial");
+        arraysCounting.add(copiarArray(arrayVisual));
+        arraysC.add(copiarArray(c));
+        arraysB.add(copiarArray(b));
+        arraysExiste.add(existe.clone());
 
         for (int i = 0; i < n; i++) {
             c[array[i]]++;
+
+            freq[array[i]]++;
+
+            existe[array[i]] = true;
+
+            arrayVisual[i] = 0;
+
+            etapasCounting.add("Contagem");
+            arraysCounting.add(copiarArray(arrayVisual));
+            arraysC.add(copiarArray(c));
+            arraysB.add(copiarArray(b));
+            arraysExiste.add(existe.clone());
         }
 
         for (int i = 1; i <= k; i++) {
             c[i] += c[i - 1];
+
+            etapasCounting.add("Acumulação");
+            arraysCounting.add(copiarArray(arrayVisual));
+            arraysC.add(copiarArray(c));
+            arraysB.add(copiarArray(b));
+            arraysExiste.add(existe.clone());
         }
 
         for (int i = n - 1; i >= 0; i--) {
             c[array[i]]--;
             b[c[array[i]]] = array[i];
+
+            freq[array[i]]--;
+
+            if (freq[array[i]] == 0) {
+                existe[array[i]] = false;
+            }
+
+            arrayVisual[i] = 0;
+
+            etapasCounting.add("Construção");
+            arraysCounting.add(copiarArray(arrayVisual));
+            arraysC.add(copiarArray(c));
+            arraysB.add(copiarArray(b));
+            arraysExiste.add(existe.clone());
         }
 
         for (int i = 0; i < n; i++) {
             array[i] = b[i];
-            arraysCounting.add(copiarArray(array));
+
+            arrayVisual[i] = b[i];
+            b[i] = 0;
+
+            etapasCounting.add("Final");
+            arraysCounting.add(copiarArray(arrayVisual));
+            arraysC.add(copiarArray(c));
+            arraysB.add(copiarArray(b));
+            arraysExiste.add(existe.clone());
         }
     }
 
