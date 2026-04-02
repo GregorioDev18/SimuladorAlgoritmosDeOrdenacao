@@ -7,6 +7,7 @@ import static br.com.davidbuzatto.jsge.core.engine.EngineFrame.ORANGE;
 import static br.com.davidbuzatto.jsge.core.engine.EngineFrame.RED;
 import static br.com.davidbuzatto.jsge.core.engine.EngineFrame.WHITE;
 import static br.com.davidbuzatto.jsge.core.engine.EngineFrame.YELLOW;
+import br.com.davidbuzatto.jsge.imgui.GuiButton;
 import br.com.davidbuzatto.jsge.imgui.GuiComponent;
 import br.com.davidbuzatto.jsge.imgui.GuiGroup;
 import br.com.davidbuzatto.jsge.imgui.GuiLabel;
@@ -47,6 +48,7 @@ public class AlgoritmosComparativos extends EngineFrame {
     private GuiSlider sliderInsertion;
     private GuiSlider sliderShell;
     private GuiSlider sliderMerge;
+    private GuiButton btnVoltar;
 
     public AlgoritmosComparativos() {
         super(
@@ -105,7 +107,10 @@ public class AlgoritmosComparativos extends EngineFrame {
         sliderShell = new GuiSlider(groupShell.getX(), groupShell.getY() + groupHeight, groupWidth, 40, 0, 0, (arraysShell.size() - 1));
         sliderMerge = new GuiSlider(groupMerge.getX(), groupMerge.getY() + groupHeight, groupWidth, 40, 0, 0, (arraysMerge.size()) - 1);
 
+        btnVoltar = new GuiButton(10, 10, 80, 20, "VOLTAR");
+
         components.add(nomes);
+        components.add(btnVoltar);
 
         sliders.add(sliderSelection);
         sliders.add(sliderInsertion);
@@ -115,9 +120,18 @@ public class AlgoritmosComparativos extends EngineFrame {
 
     @Override
     public void update(double delta) {
-        for (GuiComponent c : sliders) {
-            c.update(delta);
+        for (GuiComponent s : sliders) {
+            s.update(delta);
+        }
 
+        for (GuiComponent c : components) {
+            c.update(delta);
+        }
+
+        if (btnVoltar.isMousePressed()) {
+            Home homeWindow = new Home();
+            homeWindow.setVisible(true);
+            this.setVisible(false);
         }
 
         copiaSelection = (int) sliderSelection.getValue();
@@ -133,6 +147,10 @@ public class AlgoritmosComparativos extends EngineFrame {
         for (GuiComponent c : components) {
             c.draw();
         }
+
+        btnVoltar.setBackgroundColor(GRAY);
+        btnVoltar.setBorderColor(GRAY);
+        btnVoltar.setTextColor(BLACK);
 
         for (GuiSlider s : sliders) {
 
